@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Duck Fight - How many ducks can you take?</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Font -->
+    <!-- Google Fonts for playful arcade look -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -18,9 +18,12 @@
 
         <!-- Main Display Arena -->
         <main class="arena">
-            <div class="duck-icon-wrapper">
+            <div class="duck-icon-wrapper" id="iconWrapper">
                 <span class="duck-emoji" id="duckEmoji">🦆</span>
             </div>
+
+            <!-- Enemy Type Banner -->
+            <div class="enemy-badge" id="enemyBadge">Target: Standard Mallard</div>
 
             <div class="result-box">
                 <span class="label">You could take in a fight:</span>
