@@ -7,7 +7,7 @@ const duckEmoji = document.getElementById('duckEmoji');
 const enemyBadge = document.getElementById('enemyBadge');
 const historyList = document.getElementById('historyList');
 
-// Duck Class Definitions
+// Duck Class Definitions (Weights now correctly total 1.0)
 const duckTypes = [
     {
         name: "Standard Mallard",
@@ -51,13 +51,14 @@ let battleCount = 0;
 function getRandomDuckType() {
     const rand = Math.random();
     let cumulativeWeight = 0;
+    
     for (const type of duckTypes) {
         cumulativeWeight += type.weight;
         if (rand <= cumulativeWeight) {
             return type;
         }
     }
-    return duckTypes[0];
+    return duckTypes[0]; // Fallback
 }
 
 function generateBaseDuckCount() {
