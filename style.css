@@ -27,7 +27,6 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    flex: 1;
 }
 
 .game-container {
@@ -235,6 +234,9 @@ body {
     font-size: 0.75rem;
 }
 
+main {
+    flex: 1;
+}
 
 .footer-top{
     display: flex;
