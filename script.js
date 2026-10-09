@@ -4,86 +4,80 @@ const countDisplay = document.getElementById('countDisplay');
 const unitLabel = document.getElementById('unitLabel');
 const commentary = document.getElementById('commentary');
 const duckEmoji = document.getElementById('duckEmoji');
+const enemyBadge = document.getElementById('enemyBadge');
 const historyList = document.getElementById('historyList');
 
-// Commentary pools based on duck count thresholds
-const commentaries = {
-    tiny: [
-        "One (1) angry duck would systematically humiliate you.",
-        "You tripped over your own shoelaces before the fight even started.",
-        "A single duck stole your wallet and your dignity.",
-        "Zero ducks. Let's be honest, a pigeon could take you."
-    ],
-    low: [
-        "You might take a couple, but webed feet are your ultimate weakness.",
-        "They formed a V-formation and dive-bombed your face.",
-        "You put up a brave fight before being overwhelmed by quacks.",
-        "Not great. You got out-strategized by birds with waterproof jackets."
-    ],
-    medium: [
-        "Respectable! You held your ground against a respectable flock.",
-        "You took down a solid squad before running out of stamina.",
-        "A decent showing. The local pond will remember your name.",
-        "You cleared out the beginner ranks, but the geese reinforcements arrived."
-    ],
-    high: [
-        "Look at you! Absolute apex predator of the duck pond.",
-        "You channeled your inner warrior and scattered a massive horde.",
-        "Legendary battle skills. The ducks are migrating in fear of you.",
-        "You fought valiantly against an unstoppable web-footed tidal wave!"
-    ],
-    godlike: [
-        "GODLIKE! You could single-handedly conquer a migratory flock.",
-        "The ducks bow down to their new supreme overlord.",
-        "An unstoppable force of human power versus infinite feathers!",
-        "You are the chosen one. No duck is safe."
-    ]
-};
+// Duck Class Definitions
+const duckTypes = [
+    {
+        name: "Standard Mallard",
+        emoji: "🦆",
+        weight: 0.40, // 40% chance
+        modifier: (base) => base,
+        comment: "A classic baseline flock. Fair fight!"
+    },
+    {
+        name: "Angry Goose",
+        emoji: "🦢",
+        weight: 0.20, // 20% chance
+        modifier: (base) => Math.max(1, Math.floor(base * 0.3)), // Geese cut your score down!
+        comment: "WARNING: Geese are pure chaos. Your score plummeted!"
+    },
+    {
+        name: "Rubber Duck",
+        emoji: "🛀",
+        weight: 0.15, // 15% chance
+        modifier: (base) => base * 5, // Massive bonus
+        comment: "Squeaky clean victory! Zero threat, massive numbers."
+    },
+    {
+        name: "Cyber Duck",
+        emoji: "🤖",
+        weight: 0.15, // 15% chance
+        modifier: (base) => base * 2,
+        comment: "A mechanical menace from the future. High tech feathers!"
+    },
+    {
+        name: "Wizard Duck",
+        emoji: "🧙‍♂️",
+        weight: 0.10, // 10% chance
+        modifier: (base) => Math.floor(Math.random() * 900) + 100, // Chaotic random high score
+        comment: "Abracadabra! The wizard duck altered reality itself."
+    }
+];
 
 let battleCount = 0;
 
-// Random number generator helper (weighted slightly towards fun numbers)
-function generateDuckCount() {
+function getRandomDuckType() {
     const rand = Math.random();
-    
-    // Rare edge cases
+    let cumulativeWeight = 0;
+    for (const type of duckTypes) {
+        cumulativeWeight += type.weight;
+        if (rand <= cumulativeWeight) {
+            return type;
+        }
+    }
+    return duckTypes[0];
+}
+
+function generateBaseDuckCount() {
+    const rand = Math.random();
     if (rand < 0.03) return 0;
     if (rand < 0.06) return 1;
-    if (rand > 0.98) return Math.floor(Math.random() * 5000) + 1000; // Mega horde
-    
-    // Standard normal-ish distribution between 2 and 150
     return Math.floor(Math.random() * 148) + 2;
 }
 
-function getCommentary(count) {
-    let pool;
-    if (count === 0 || count === 1) {
-        pool = commentaries.tiny;
-    } else if (count < 10) {
-        pool = commentaries.low;
-    } else if (count < 50) {
-        pool = commentaries.medium;
-    } else if (count < 500) {
-        pool = commentaries.high;
-    } else {
-        pool = commentaries.godlike;
-    }
-    return pool[Math.floor(Math.random() * pool.length)];
-}
-
-function recordHistory(count) {
+function recordHistory(className, count) {
     if (battleCount === 1) {
-        historyList.innerHTML = ''; // Clear empty state message
+        historyList.innerHTML = ''; 
     }
 
     const item = document.createElement('li');
     item.className = 'history-item';
-    item.innerHTML = `<span>Battle #${battleCount}: ${count} ducks</span> <span>Just now</span>`;
+    item.innerHTML = `<span>${className}: ${count}</span> <span>Just now</span>`;
     
-    // Prepend to top of history
     historyList.prepend(item);
 
-    // Keep history trimmed to max 5 items
     if (historyList.children.length > 5) {
         historyList.removeChild(historyList.lastChild);
     }
@@ -93,23 +87,27 @@ function recordHistory(count) {
 fightBtn.addEventListener('click', () => {
     battleCount++;
     
-    // UI feedback animation
     fightBtn.disabled = true;
     duckEmoji.classList.add('quacking');
     countDisplay.textContent = "...";
+    enemyBadge.textContent = "Scanning Target...";
     commentary.textContent = "Assessing the avian battlefield...";
 
-    // Dramatic short delay before revealing result
     setTimeout(() => {
-        const ducks = generateDuckCount();
-        
-        countDisplay.textContent = ducks.toLocaleString();
-        unitLabel.textContent = ducks === 1 ? "Duck" : "Ducks";
-        commentary.textContent = getCommentary(ducks);
+        const selectedType = getRandomDuckType();
+        const baseCount = generateBaseDuckCount();
+        const finalCount = selectedType.modifier(baseCount);
+
+        // Update UI with class specifics
+        duckEmoji.textContent = selectedType.emoji;
+        enemyBadge.textContent = `Target: ${selectedType.name}`;
+        countDisplay.textContent = finalCount.toLocaleString();
+        unitLabel.textContent = finalCount === 1 ? "Duck" : "Ducks";
+        commentary.textContent = selectedType.comment;
         
         duckEmoji.classList.remove('quacking');
         fightBtn.disabled = false;
 
-        recordHistory(ducks);
-    }, 400);
+        recordHistory(selectedType.name, finalCount);
+    }, 450);
 });
