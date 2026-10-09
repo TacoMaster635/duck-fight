@@ -37,7 +37,7 @@ body {
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
 }
 
 /* Header */
@@ -60,32 +60,33 @@ body {
     font-weight: 400;
 }
 
-
+/* Arena */
 .arena {
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    padding: 24px;
+    padding: 20px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 .duck-icon-wrapper {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     background: rgba(245, 158, 11, 0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 2px dashed var(--primary);
+    transition: all 0.3s ease;
 }
 
 .duck-emoji {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     transition: transform 0.3s ease;
 }
 
@@ -98,14 +99,26 @@ body {
     100% { transform: translateY(-8px) scale(1.1); }
 }
 
+/* Enemy Badge */
+.enemy-badge {
+    font-size: 0.75rem;
+    font-family: 'Press Start 2P', monospace;
+    background: rgba(56, 189, 248, 0.1);
+    color: var(--accent);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    text-transform: uppercase;
+}
+
 .result-box {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .result-box .label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-muted);
@@ -114,23 +127,23 @@ body {
 
 .count-display {
     font-family: 'Press Start 2P', monospace;
-    font-size: 2.2rem;
+    font-size: 2rem;
     color: var(--accent);
     margin: 4px 0;
     text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
 }
 
 .unit-label {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--primary);
 }
 
 .commentary {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
     font-style: italic;
-    min-height: 42px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,7 +163,7 @@ body {
     border: none;
     font-family: 'Press Start 2P', monospace;
     font-size: 0.85rem;
-    padding: 18px 24px;
+    padding: 16px 24px;
     border-radius: 12px;
     cursor: pointer;
     box-shadow: 0 4px 0 #b45309;
@@ -172,17 +185,17 @@ body {
     background: rgba(15, 23, 42, 0.4);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 16px;
-    max-height: 150px;
+    padding: 14px;
+    max-height: 140px;
     overflow-y: auto;
 }
 
 .stats-panel h3 {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-muted);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 #historyList {
@@ -190,15 +203,14 @@ body {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    font-size: 0.85krem;
 }
 
 .empty-history {
     color: var(--text-muted);
     font-style: italic;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-align: center;
-    padding: 8px 0;
+    padding: 6px 0;
 }
 
 .history-item {
@@ -207,7 +219,7 @@ body {
     background: rgba(255, 255, 255, 0.03);
     padding: 6px 10px;
     border-radius: 6px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .history-item span:first-child {
@@ -217,5 +229,5 @@ body {
 
 .history-item span:last-child {
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
