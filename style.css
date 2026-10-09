@@ -25,7 +25,8 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-
+    display: flex;
+    flex-direction: column;
 }
 
 .game-container {
@@ -231,4 +232,16 @@ body {
 .history-item span:last-child {
     color: var(--text-muted);
     font-size: 0.75rem;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    background: #161b33;
 }
