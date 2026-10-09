@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duck Fight - How many ducks can you take?</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <h1>DUCK FIGHT</h1>
+            <p class="subtitle">The Ultimate Avian Combat Calculator</p>
+        </header>
+
+        <!-- Main Display Arena -->
+        <main class="arena">
+            <div class="duck-icon-wrapper">
+                <span class="duck-emoji" id="duckEmoji">🦆</span>
+            </div>
+
+            <div class="result-box">
+                <span class="label">You could take in a fight:</span>
+                <div class="count-display" id="countDisplay">???</div>
+                <div class="unit-label" id="unitLabel">Ducks</div>
+            </div>
+
+            <p class="commentary" id="commentary">Press the button below to test your might against the feathered horde.</p>
+        </main>
+
+        <!-- Controls -->
+        <footer class="controls">
+            <button id="fightBtn" class="fight-btn">FIGHT THE HORDE!</button>
+        </footer>
+
+        <!-- History / Stats Log -->
+        <section class="stats-panel">
+            <h3>Battle History</h3>
+            <ul id="historyList">
+                <li class="empty-history">No battles recorded yet...</li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- JavaScript File -->
+    <script src="script.js"></script>
+</body>
+</html>
