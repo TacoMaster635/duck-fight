@@ -242,6 +242,6 @@ main {
     display: flex;
     justify-content: center;
     text-align: center;
-    padding: 20px;
+    padding: 0px;
     background: #161b33;
 }
