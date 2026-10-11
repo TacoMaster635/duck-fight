@@ -7,48 +7,42 @@ const duckEmoji = document.getElementById('duckEmoji');
 const enemyBadge = document.getElementById('enemyBadge');
 const historyList = document.getElementById('historyList');
 
+// Duck Class Definitions (Weights now correctly total 1.0)
 const duckTypes = [
     {
         name: "Standard Mallard",
         emoji: "🦆",
-        weight: 0.40, 
+        weight: 0.40, // 40% chance
         modifier: (base) => base,
         comment: "A classic baseline flock. Fair fight!"
     },
     {
         name: "Angry Goose",
         emoji: "🦢",
-        weight: 0.20, 
-        modifier: (base) => Math.max(1, Math.floor(base * 0.3)), 
+        weight: 0.20, // 20% chance
+        modifier: (base) => Math.max(1, Math.floor(base * 0.3)), // Geese cut your score down!
         comment: "WARNING: Geese are pure chaos. Your score plummeted!"
     },
     {
         name: "Rubber Duck",
         emoji: "🛀",
-        weight: 0.15, 
-        modifier: (base) => base * 5
+        weight: 0.15, // 15% chance
+        modifier: (base) => base * 5, // Massive bonus
         comment: "Squeaky clean victory! Zero threat, massive numbers."
     },
     {
         name: "Cyber Duck",
         emoji: "🤖",
-        weight: 0.15, 
+        weight: 0.15, // 15% chance
         modifier: (base) => base * 2,
         comment: "A mechanical menace from the future. High tech feathers!"
     },
     {
         name: "Wizard Duck",
         emoji: "🧙‍♂️",
-        weight: 0.099, 
-        modifier: (base) => Math.floor(Math.random() * 900) + 100, 
+        weight: 0.10, // 10% chance
+        modifier: (base) => Math.floor(Math.random() * 900) + 100, // Chaotic random high score
         comment: "Abracadabra! The wizard duck altered reality itself."
-    },
-    {   
-        name: "Cosmic Duck,
-        emoji: "🌌",
-        weight: 0.001,
-        modifier: (base) => Math.floor(Math.random() * 987654321),
-        comment: "It's from out of this world!"
     }
 ];
 
@@ -64,7 +58,7 @@ function getRandomDuckType() {
             return type;
         }
     }
-    return duckTypes[0];
+    return duckTypes[0]; // Fallback
 }
 
 function generateBaseDuckCount() {
