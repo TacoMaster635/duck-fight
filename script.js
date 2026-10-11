@@ -43,11 +43,11 @@ const duckTypes = [
         modifier: (base) => Math.floor(Math.random() * 900) + 100, 
         comment: "Abracadabra! The wizard duck altered reality itself."
     }
-    name: "Cosmic Duck,
-    emoji: "🌌",
-    weight: 0.001,
-    modifier: (base) => Math.floor(Math.random() * 987654321),
-    comment: "It's from out of this world!"
+        name: "Cosmic Duck,
+        emoji: "🌌",
+        weight: 0.001,
+        modifier: (base) => Math.floor(Math.random() * 987654321),
+        comment: "It's from out of this world!"
 ];
 
 let battleCount = 0;
