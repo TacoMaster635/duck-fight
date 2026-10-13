@@ -119,3 +119,33 @@ fightBtn.addEventListener('click', () => {
         recordHistory(selectedType.name, finalCount);
     }, 450);
 });
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === "Space") {
+        battleCount++;
+        
+        fightBtn.disabled = true;
+        duckEmoji.classList.add('quacking');
+        countDisplay.textContent = "...";
+        enemyBadge.textContent = "Scanning Target...";
+        commentary.textContent = "Assessing the avian battlefield...";
+    
+        setTimeout(() => {
+            const selectedType = getRandomDuckType();
+            const baseCount = generateBaseDuckCount();
+            const finalCount = selectedType.modifier(baseCount);
+    
+            // Update UI with class specifics
+            duckEmoji.textContent = selectedType.emoji;
+            enemyBadge.textContent = `Target: ${selectedType.name}`;
+            countDisplay.textContent = finalCount.toLocaleString();
+            unitLabel.textContent = finalCount === 1 ? "Duck" : "Ducks";
+            commentary.textContent = selectedType.comment;
+            
+            duckEmoji.classList.remove('quacking');
+            fightBtn.disabled = false;
+    
+            recordHistory(selectedType.name, finalCount);
+        }, 450);
+    }
+});
