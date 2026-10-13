@@ -1,10 +1,10 @@
-#Duck Fight
+# Duck Fight
 Click or press space and fight some ducks
 
 
 
 
-##Rarities
+## Rarities
 "Standard Mallard" 0.399 chance
 "Angry Goose" 0.2 chance
 "Rubber Duck" 0.15 chance
