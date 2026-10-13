@@ -1,78 +1,77 @@
-// DOM Elements
-const fightBtn = document.getElementById('fightBtn');
-const countDisplay = document.getElementById('countDisplay');
-const unitLabel = document.getElementById('unitLabel');
-const commentary = document.getElementById('commentary');
-const duckEmoji = document.getElementById('duckEmoji');
-const enemyBadge = document.getElementById('enemyBadge');
-const historyList = document.getElementById('historyList');
+const fightBtn = document.getElementById("fightBtn");
+const countDisplay = document.getElementById("countDisplay");
+const unitLabel = document.getElementById("unitLabel");
+const commentary = document.getElementById("commentary");
+const duckEmoji = document.getElementById("duckEmoji");
+const enemyBadge = document.getElementById("enemyBadge");
+const historyList = document.getElementById("historyList");
 
-// Duck Class Definitions (Weights now correctly total 1.0)
+const accountButton = document.getElementById("accountButton");
+const accountMenu = document.getElementById("accountMenu");
+const closeAccountButton = document.getElementById("closeAccountButton");
+const saveNameButton = document.getElementById("saveNameButton");
+const resetStatsButton = document.getElementById("resetStatsButton");
+const playerNameInput = document.getElementById("playerName");
+const welcomeMessage = document.getElementById("welcomeMessage");
+const totalDucksFought = document.getElementById("totalDucksFought");
+const duckTypeStats = document.getElementById("duckTypeStats");
+
 const duckTypes = [
-    {
-        name: "Standard Mallard",
-        emoji: "🦆",
-        weight: 0.399,
-        modifier: (base) => base,
-        comment: "A classic baseline flock. Fair fight!"
-    },
-    {
-        name: "Angry Goose",
-        emoji: "🦢",
-        weight: 0.20,
-        modifier: (base) => Math.max(1, Math.floor(base * 0.3)),
-        comment: "WARNING: Geese are pure chaos. Your score plummeted!"
-    },
-    {
-        name: "Rubber Duck",
-        emoji: "🛀",
-        weight: 0.15,
-        modifier: (base) => base * 5,
-        comment: "Squeaky clean victory! Zero threat, massive numbers."
-    },
-    {
-        name: "Cyber Duck",
-        emoji: "🤖",
-        weight: 0.15,
-        modifier: (base) => base * 2,
-        comment: "A mechanical menace from the future. High tech feathers!"
-    },
-    {
-        name: "Wizard Duck",
-        emoji: "🧙‍♂️",
-        weight: 0.10,
-        modifier: (base) => Math.floor(Math.random() * 900) + 100,
-        comment: "Abracadabra! The wizard duck altered reality itself."
-    },
-    {
-        name: "Cosmic Duck",
-        emoji: "🌌",
-        weight: 0.001,
-        modifier: (base) => Math.floor(Math.random() * 987654321),
-        comment: "It's from out of this world!"
-    }
+  {
+    name: "Standard Mallard",
+    emoji: "🦆",
+    weight: 0.399,
+    modifier: (base) => base,
+    comment: "A classic baseline flock. Fair fight!"
+  },
+  {
+    name: "Angry Goose",
+    emoji: "🦢",
+    weight: 0.2,
+    modifier: (base) => Math.max(1, Math.floor(base * 0.3)),
+    comment: "WARNING: Geese are pure chaos. Your score plummeted!"
+  },
+  {
+    name: "Rubber Duck",
+    emoji: "🛀",
+    weight: 0.15,
+    modifier: (base) => base * 5,
+    comment: "Squeaky clean victory! Zero threat, massive numbers."
+  },
+  {
+    name: "Cyber Duck",
+    emoji: "🤖",
+    weight: 0.15,
+    modifier: (base) => base * 2,
+    comment: "A mechanical menace from the future. High tech feathers!"
+  },
+  {
+    name: "Wizard Duck",
+    emoji: "🧙‍♂️",
+    weight: 0.1,
+    modifier: () => Math.floor(Math.random() * 900) + 100,
+    comment: "Abracadabra! The wizard duck altered reality itself."
+  },
+  {
+    name: "Cosmic Duck",
+    emoji: "🌌",
+    weight: 0.001,
+    modifier: () => Math.floor(Math.random() * 987654321),
+    comment: "It's from out of this world!"
+  }
 ];
 
-let battleCount = 0;
-
-
+const duckTypeNames = duckTypes.map((duckType) => duckType.name);
 const DUCK_FIGHT_SAVE_KEY = "duckFight_playerData_v1";
 
-
-const duckTypes = [
-  "Standard Mallard"
-  "Angry Goose",
-  "Rubber Duck",
-  "Cyber Duck",
-  "Wizard Duck",
-  "Cosmic Duck"
-];
+let battleCount = 0;
+let fightInProgress = false;
 
 function createNewPlayerData() {
   const duckCounts = {};
 
-  for (const duckType of duckTypes) {
-    duckCounts[duckType] = 0;
+  for (const duckName of duckTypeNames) {
+    duckCounts[duckName] = 0;
   }
 
   return {
@@ -85,45 +84,44 @@ function createNewPlayerData() {
 function loadPlayerData() {
   const savedData = localStorage.getItem(DUCK_FIGHT_SAVE_KEY);
 
-  if (savedData === null) {
+  if (!savedData) {
     return createNewPlayerData();
   }
 
   try {
     const parsedData = JSON.parse(savedData);
-    const defaultData = createNewPlayerData();
-
-
-    for (const duckType of duckTypes) {
-      if (
-        !parsedData.ducksByType ||
-        typeof parsedData.ducksByType[duckType] !== "number"
-      ) {
-        defaultData.ducksByType[duckType] = 0;
-      } else {
-        defaultData.ducksByType[duckType] =
-          parsedData.ducksByType[duckType];
-      }
-    }
+    const loadedData = createNewPlayerData();
 
     if (
       typeof parsedData.name === "string" &&
       parsedData.name.trim() !== ""
     ) {
-      defaultData.name = parsedData.name;
+      loadedData.name = parsedData.name.trim();
     }
 
-    if (typeof parsedData.totalDucksFought === "number") {
-      defaultData.totalDucksFought =
-        parsedData.totalDucksFought;
+    if (
+      typeof parsedData.totalDucksFought === "number" &&
+      parsedData.totalDucksFought >= 0
+    ) {
+      loadedData.totalDucksFought = parsedData.totalDucksFought;
     }
 
-    return defaultData;
+    for (const duckName of duckTypeNames) {
+      const savedCount = parsedData.ducksByType?.[duckName];
+
+      if (typeof savedCount === "number" && savedCount >= 0) {
+        loadedData.ducksByType[duckName] = savedCount;
+      }
+    }
+
+    return loadedData;
   } catch (error) {
-    console.error("Duck Fight save could not be loaded:", error);
+    console.error("Could not load Duck Fight save:", error);
     return createNewPlayerData();
   }
 }
+
+let playerData = loadPlayerData();
 
 function savePlayerData() {
   localStorage.setItem(
@@ -132,42 +130,23 @@ function savePlayerData() {
   );
 }
 
-let playerData = loadPlayerData();
-
-/*
-  Call this whenever the player fights ducks.
-
-  Example:
-  recordDuckFight("Rare Duck", 7);
-*/
-function recordDuckFight(duckType, amount = 1) {
-  if (!duckTypes.includes(duckType)) {
-    console.error(`Unknown duck type: ${duckType}`);
+function recordDuckFight(duckName, amount) {
+  if (!duckTypeNames.includes(duckName)) {
     return;
   }
 
-  if (!Number.isInteger(amount) || amount <= 0) {
-    console.error("Duck amount must be a positive whole number.");
+  if (!Number.isInteger(amount) || amount < 0) {
     return;
   }
 
   playerData.totalDucksFought += amount;
-  playerData.ducksByType[duckType] += amount;
+  playerData.ducksByType[duckName] += amount;
 
   savePlayerData();
   updateAccountMenu();
 }
 
 function updateAccountMenu() {
-  const welcomeMessage =
-    document.getElementById("welcomeMessage");
-
-  const totalDucksFought =
-    document.getElementById("totalDucksFought");
-
-  const duckTypeStats =
-    document.getElementById("duckTypeStats");
-
   welcomeMessage.textContent = `Welcome, ${playerData.name}!`;
 
   totalDucksFought.textContent =
@@ -180,11 +159,11 @@ function updateAccountMenu() {
     statRow.className = "duck-stat";
 
     const duckName = document.createElement("span");
-    duckName.textContent = duckType;
+    duckName.textContent = `${duckType.emoji} ${duckType.name}`;
 
     const duckAmount = document.createElement("strong");
     duckAmount.textContent =
-      playerData.ducksByType[duckType].toLocaleString();
+      playerData.ducksByType[duckType.name].toLocaleString();
 
     statRow.append(duckName, duckAmount);
     duckTypeStats.appendChild(statRow);
@@ -192,9 +171,6 @@ function updateAccountMenu() {
 }
 
 function savePlayerName() {
-  const playerNameInput =
-    document.getElementById("playerName");
-
   const newName = playerNameInput.value.trim();
 
   if (newName === "") {
@@ -203,24 +179,20 @@ function savePlayerName() {
   }
 
   playerData.name = newName;
+  playerNameInput.value = "";
+
   savePlayerData();
   updateAccountMenu();
-
-  playerNameInput.value = "";
 }
 
 function openAccountMenu() {
-  document
-    .getElementById("accountMenu")
-    .classList.remove("hidden");
-
+  accountMenu.classList.remove("hidden");
+  playerNameInput.value = playerData.name;
   updateAccountMenu();
 }
 
 function closeAccountMenu() {
-  document
-    .getElementById("accountMenu")
-    .classList.add("hidden");
+  accountMenu.classList.add("hidden");
 }
 
 function resetPlayerStats() {
@@ -241,133 +213,125 @@ function resetPlayerStats() {
   updateAccountMenu();
 }
 
-document
-  .getElementById("accountButton")
-  .addEventListener("click", openAccountMenu);
-
-document
-  .getElementById("closeAccountButton")
-  .addEventListener("click", closeAccountMenu);
-
-document
-  .getElementById("saveNameButton")
-  .addEventListener("click", savePlayerName);
-
-document
-  .getElementById("resetStatsButton")
-  .addEventListener("click", resetPlayerStats);
-
-document
-  .getElementById("playerName")
-  .addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      savePlayerName();
-    }
-  });
-
-document
-  .getElementById("accountMenu")
-  .addEventListener("click", function (event) {
-    if (event.target.id === "accountMenu") {
-      closeAccountMenu();
-    }
-  });
-
-updateAccountMenu();
-
-
 function getRandomDuckType() {
-    const rand = Math.random();
-    let cumulativeWeight = 0;
-    
-    for (const type of duckTypes) {
-        cumulativeWeight += type.weight;
-        if (rand <= cumulativeWeight) {
-            return type;
-        }
+  const randomNumber = Math.random();
+  let cumulativeWeight = 0;
+
+  for (const duckType of duckTypes) {
+    cumulativeWeight += duckType.weight;
+
+    if (randomNumber <= cumulativeWeight) {
+      return duckType;
     }
-    return duckTypes[0]; // Fallback
+  }
+
+  return duckTypes[0];
 }
 
 function generateBaseDuckCount() {
-    const rand = Math.random();
-    if (rand < 0.03) return 0;
-    if (rand < 0.06) return 1;
-    return Math.floor(Math.random() * 148) + 2;
+  const randomNumber = Math.random();
+
+  if (randomNumber < 0.03) {
+    return 0;
+  }
+
+  if (randomNumber < 0.06) {
+    return 1;
+  }
+
+  return Math.floor(Math.random() * 148) + 2;
 }
 
-function recordHistory(className, count) {
-    if (battleCount === 1) {
-        historyList.innerHTML = ''; 
-    }
+function recordHistory(duckName, count) {
+  if (battleCount === 1) {
+    historyList.replaceChildren();
+  }
 
-    const item = document.createElement('li');
-    item.className = 'history-item';
-    item.innerHTML = `<span>${className}: ${count}</span> <span>Just now</span>`;
-    
-    historyList.prepend(item);
+  const item = document.createElement("li");
+  item.className = "history-item";
 
-    if (historyList.children.length > 5) {
-        historyList.removeChild(historyList.lastChild);
-    }
+  const result = document.createElement("span");
+  result.textContent = `${duckName}: ${count.toLocaleString()}`;
+
+  const time = document.createElement("span");
+  time.textContent = "Just now";
+
+  item.append(result, time);
+  historyList.prepend(item);
+
+  if (historyList.children.length > 5) {
+    historyList.lastElementChild.remove();
+  }
 }
 
-// Main Button Event Handler
-fightBtn.addEventListener('click', () => {
-    battleCount++;
-    
-    fightBtn.disabled = true;
-    duckEmoji.classList.add('quacking');
-    countDisplay.textContent = "...";
-    enemyBadge.textContent = "Scanning Target...";
-    commentary.textContent = "Assessing the avian battlefield...";
+function startFight() {
+  if (fightInProgress) {
+    return;
+  }
 
-    setTimeout(() => {
-        const selectedType = getRandomDuckType();
-        const baseCount = generateBaseDuckCount();
-        const finalCount = selectedType.modifier(baseCount);
+  fightInProgress = true;
+  battleCount++;
 
-        // Update UI with class specifics
-        duckEmoji.textContent = selectedType.emoji;
-        enemyBadge.textContent = `Target: ${selectedType.name}`;
-        countDisplay.textContent = finalCount.toLocaleString();
-        unitLabel.textContent = finalCount === 1 ? "Duck" : "Ducks";
-        commentary.textContent = selectedType.comment;
-        
-        duckEmoji.classList.remove('quacking');
-        fightBtn.disabled = false;
+  fightBtn.disabled = true;
+  duckEmoji.classList.add("quacking");
 
-        recordHistory(selectedType.name, finalCount);
-    }, 450);
+  countDisplay.textContent = "...";
+  enemyBadge.textContent = "Scanning Target...";
+  commentary.textContent = "Assessing the avian battlefield...";
+
+  setTimeout(() => {
+    const selectedType = getRandomDuckType();
+    const baseCount = generateBaseDuckCount();
+    const finalCount = Math.floor(selectedType.modifier(baseCount));
+
+    duckEmoji.textContent = selectedType.emoji;
+    enemyBadge.textContent = `Target: ${selectedType.name}`;
+    countDisplay.textContent = finalCount.toLocaleString();
+    unitLabel.textContent = finalCount === 1 ? "Duck" : "Ducks";
+    commentary.textContent = selectedType.comment;
+
+    recordHistory(selectedType.name, finalCount);
+    recordDuckFight(selectedType.name, finalCount);
+
+    duckEmoji.classList.remove("quacking");
+    fightBtn.disabled = false;
+    fightInProgress = false;
+  }, 450);
+}
+
+fightBtn.addEventListener("click", startFight);
+
+document.addEventListener("keydown", (event) => {
+  const activeElement = document.activeElement;
+  const isTyping =
+    activeElement.tagName === "INPUT" ||
+    activeElement.tagName === "TEXTAREA";
+
+  if (event.code === "Space" && !event.repeat && !isTyping) {
+    event.preventDefault();
+    startFight();
+  }
+
+  if (event.key === "Escape" && !accountMenu.classList.contains("hidden")) {
+    closeAccountMenu();
+  }
 });
 
-document.addEventListener('keydown', (e) => {
-    if (e.code === "Space" && !e.repeat) {
-        e.preventDefault();
-        battleCount++;
-        
-        fightBtn.disabled = true;
-        duckEmoji.classList.add('quacking');
-        countDisplay.textContent = "...";
-        enemyBadge.textContent = "Scanning Target...";
-        commentary.textContent = "Assessing the avian battlefield...";
-    
-        setTimeout(() => {
-            const selectedType = getRandomDuckType();
-            const baseCount = generateBaseDuckCount();
-            const finalCount = selectedType.modifier(baseCount);
-    
-            // Update UI with class specifics
-            duckEmoji.textContent = selectedType.emoji;
-            enemyBadge.textContent = `Target: ${selectedType.name}`;
-            countDisplay.textContent = finalCount.toLocaleString();
-            unitLabel.textContent = finalCount === 1 ? "Duck" : "Ducks";
-            commentary.textContent = selectedType.comment;
-            
-            duckEmoji.classList.remove('quacking');
-            fightBtn.disabled = false;
-    
-            recordHistory(selectedType.name, finalCount);
-        }, 450);
-    }
+accountButton.addEventListener("click", openAccountMenu);
+closeAccountButton.addEventListener("click", closeAccountMenu);
+saveNameButton.addEventListener("click", savePlayerName);
+resetStatsButton.addEventListener("click", resetPlayerStats);
+
+playerNameInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    savePlayerName();
+  }
 });
+
+accountMenu.addEventListener("click", (event) => {
+  if (event.target === accountMenu) {
+    closeAccountMenu();
+  }
+});
+
+updateAccountMenu();
