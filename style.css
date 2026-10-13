@@ -242,7 +242,7 @@ main {
     display: flex;
     justify-content: center;
     text-align: center;
-    padding: 2px;
+    padding: 5px;
     background: #7070FF;
-    width: 100%;
+    width: 102%;
 }
