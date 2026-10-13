@@ -137,7 +137,7 @@ body {
   border-radius: 18px;
 
   background: #0f172a;
-  color: #222222;
+  color: #ffffff;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
 }
 
@@ -184,7 +184,7 @@ body {
   margin: 8px 0;
   padding: 12px;
   border-radius: 9px;
-  background: #f3f3f3;
+  background: #6786e3;
 }
 
 .danger-button {
