@@ -63,9 +63,11 @@ const duckTypes = [
 
 const duckTypeNames = duckTypes.map((duckType) => duckType.name);
 const DUCK_FIGHT_SAVE_KEY = "duckFight_playerData_v1";
+const FIGHT_COOLDOWN = 1000;
 
 let battleCount = 0;
 let fightInProgress = false;
+let lastFightTime = 0;
 
 function createNewPlayerData() {
   const duckCounts = {};
@@ -265,6 +267,13 @@ function recordHistory(duckName, count) {
 }
 
 function startFight() {
+  const now = Date.now();
+  if (now - lastFightTime < FIGHT_COOLDOWN) {
+    return;
+  }
+
+  lastFightTime = now;
+  
   if (fightInProgress) {
     return;
   }
