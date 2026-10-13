@@ -121,7 +121,7 @@ fightBtn.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (e) => {
-    if (e.code === "Space") {
+    if (e.code === "Space" && !e.repeat) {
         battleCount++;
         
         fightBtn.disabled = true;
