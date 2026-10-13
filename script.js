@@ -63,7 +63,7 @@ const duckTypes = [
 
 const duckTypeNames = duckTypes.map((duckType) => duckType.name);
 const DUCK_FIGHT_SAVE_KEY = "duckFight_playerData_v1";
-const FIGHT_COOLDOWN = 1000;
+const FIGHT_COOLDOWN = 800;
 
 let battleCount = 0;
 let fightInProgress = false;
