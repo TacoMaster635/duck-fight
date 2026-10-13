@@ -48,12 +48,233 @@ const duckTypes = [
         name: "Cosmic Duck",
         emoji: "🌌",
         weight: 0.001,
-        modifier: (base) => Math.floor(Math.random() * 987654321) + 67,
+        modifier: (base) => Math.floor(Math.random() * 987654321),
         comment: "It's from out of this world!"
     }
 ];
 
 let battleCount = 0;
+
+
+const DUCK_FIGHT_SAVE_KEY = "duckFight_playerData_v1";
+
+
+const duckTypes = [
+  "Standard Mallard"
+  "Angry Goose",
+  "Rubber Duck",
+  "Cyber Duck",
+  "Wizard Duck",
+  "Cosmic Duck"
+];
+
+function createNewPlayerData() {
+  const duckCounts = {};
+
+  for (const duckType of duckTypes) {
+    duckCounts[duckType] = 0;
+  }
+
+  return {
+    name: "Duck Fighter",
+    totalDucksFought: 0,
+    ducksByType: duckCounts
+  };
+}
+
+function loadPlayerData() {
+  const savedData = localStorage.getItem(DUCK_FIGHT_SAVE_KEY);
+
+  if (savedData === null) {
+    return createNewPlayerData();
+  }
+
+  try {
+    const parsedData = JSON.parse(savedData);
+    const defaultData = createNewPlayerData();
+
+
+    for (const duckType of duckTypes) {
+      if (
+        !parsedData.ducksByType ||
+        typeof parsedData.ducksByType[duckType] !== "number"
+      ) {
+        defaultData.ducksByType[duckType] = 0;
+      } else {
+        defaultData.ducksByType[duckType] =
+          parsedData.ducksByType[duckType];
+      }
+    }
+
+    if (
+      typeof parsedData.name === "string" &&
+      parsedData.name.trim() !== ""
+    ) {
+      defaultData.name = parsedData.name;
+    }
+
+    if (typeof parsedData.totalDucksFought === "number") {
+      defaultData.totalDucksFought =
+        parsedData.totalDucksFought;
+    }
+
+    return defaultData;
+  } catch (error) {
+    console.error("Duck Fight save could not be loaded:", error);
+    return createNewPlayerData();
+  }
+}
+
+function savePlayerData() {
+  localStorage.setItem(
+    DUCK_FIGHT_SAVE_KEY,
+    JSON.stringify(playerData)
+  );
+}
+
+let playerData = loadPlayerData();
+
+/*
+  Call this whenever the player fights ducks.
+
+  Example:
+  recordDuckFight("Rare Duck", 7);
+*/
+function recordDuckFight(duckType, amount = 1) {
+  if (!duckTypes.includes(duckType)) {
+    console.error(`Unknown duck type: ${duckType}`);
+    return;
+  }
+
+  if (!Number.isInteger(amount) || amount <= 0) {
+    console.error("Duck amount must be a positive whole number.");
+    return;
+  }
+
+  playerData.totalDucksFought += amount;
+  playerData.ducksByType[duckType] += amount;
+
+  savePlayerData();
+  updateAccountMenu();
+}
+
+function updateAccountMenu() {
+  const welcomeMessage =
+    document.getElementById("welcomeMessage");
+
+  const totalDucksFought =
+    document.getElementById("totalDucksFought");
+
+  const duckTypeStats =
+    document.getElementById("duckTypeStats");
+
+  welcomeMessage.textContent = `Welcome, ${playerData.name}!`;
+
+  totalDucksFought.textContent =
+    playerData.totalDucksFought.toLocaleString();
+
+  duckTypeStats.replaceChildren();
+
+  for (const duckType of duckTypes) {
+    const statRow = document.createElement("div");
+    statRow.className = "duck-stat";
+
+    const duckName = document.createElement("span");
+    duckName.textContent = duckType;
+
+    const duckAmount = document.createElement("strong");
+    duckAmount.textContent =
+      playerData.ducksByType[duckType].toLocaleString();
+
+    statRow.append(duckName, duckAmount);
+    duckTypeStats.appendChild(statRow);
+  }
+}
+
+function savePlayerName() {
+  const playerNameInput =
+    document.getElementById("playerName");
+
+  const newName = playerNameInput.value.trim();
+
+  if (newName === "") {
+    alert("Please enter a fighter name.");
+    return;
+  }
+
+  playerData.name = newName;
+  savePlayerData();
+  updateAccountMenu();
+
+  playerNameInput.value = "";
+}
+
+function openAccountMenu() {
+  document
+    .getElementById("accountMenu")
+    .classList.remove("hidden");
+
+  updateAccountMenu();
+}
+
+function closeAccountMenu() {
+  document
+    .getElementById("accountMenu")
+    .classList.add("hidden");
+}
+
+function resetPlayerStats() {
+  const shouldReset = window.confirm(
+    "Reset your local Duck Fight stats? This cannot be undone."
+  );
+
+  if (!shouldReset) {
+    return;
+  }
+
+  const savedName = playerData.name;
+
+  playerData = createNewPlayerData();
+  playerData.name = savedName;
+
+  savePlayerData();
+  updateAccountMenu();
+}
+
+document
+  .getElementById("accountButton")
+  .addEventListener("click", openAccountMenu);
+
+document
+  .getElementById("closeAccountButton")
+  .addEventListener("click", closeAccountMenu);
+
+document
+  .getElementById("saveNameButton")
+  .addEventListener("click", savePlayerName);
+
+document
+  .getElementById("resetStatsButton")
+  .addEventListener("click", resetPlayerStats);
+
+document
+  .getElementById("playerName")
+  .addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      savePlayerName();
+    }
+  });
+
+document
+  .getElementById("accountMenu")
+  .addEventListener("click", function (event) {
+    if (event.target.id === "accountMenu") {
+      closeAccountMenu();
+    }
+  });
+
+updateAccountMenu();
+
 
 function getRandomDuckType() {
     const rand = Math.random();
