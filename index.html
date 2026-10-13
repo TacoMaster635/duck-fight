@@ -11,6 +11,51 @@
 </head>
 <main>
 <body>
+    <!-- Account button -->
+<button id="accountButton" type="button">👤 Account</button>
+
+<!-- Account menu -->
+<div id="accountMenu" class="account-menu hidden">
+  <div class="account-card">
+    <button id="closeAccountButton" class="close-button" type="button">
+      ×
+    </button>
+
+    <h2>Duck Fighter Account</h2>
+
+    <label for="playerName">Fighter name</label>
+
+    <div class="name-row">
+      <input
+        id="playerName"
+        type="text"
+        maxlength="20"
+        placeholder="Enter your name"
+      />
+
+      <button id="saveNameButton" type="button">Save</button>
+    </div>
+
+    <h3 id="welcomeMessage">Welcome, Duck Fighter!</h3>
+
+    <div class="stat">
+      <span>Total ducks fought</span>
+      <strong id="totalDucksFought">0</strong>
+    </div>
+
+    <h3>Ducks fought by type</h3>
+
+    <div id="duckTypeStats"></div>
+
+    <button id="resetStatsButton" class="danger-button" type="button">
+      Reset local stats
+    </button>
+
+    <p class="save-note">
+      These stats are saved on this browser.
+    </p>
+  </div>
+</div>
     <div class="game-container">
         <!-- Header -->
         <header class="game-header">
