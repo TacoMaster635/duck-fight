@@ -18,5 +18,5 @@ Click or press space and fight some ducks
 
 
 
-
+###NOTICE:
 Duck fight does not indorse fighting ducks, hunting, or anything else in real life. This is purely supposed to be fun.
