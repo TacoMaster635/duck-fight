@@ -46,7 +46,7 @@ const duckTypes = [
     name: "Cyber Duck",
     emoji: "🤖",
     weight: 0.15,
-    modifier: (base) => base * 2,
+    modifier: (base) => base * 7,
     comment: "A mechanical menace from the future. High tech feathers!"
   },
   {
