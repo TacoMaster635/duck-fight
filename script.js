@@ -15,6 +15,10 @@ const playerNameInput = document.getElementById("playerName");
 const welcomeMessage = document.getElementById("welcomeMessage");
 const totalDucksFought = document.getElementById("totalDucksFought");
 const duckTypeStats = document.getElementById("duckTypeStats");
+const achievementList = document.getElementById("achievementList");
+const achievementToast = document.getElementById("achievementToast");
+const toastName = document.getElementById("toastName");
+const toastEmoji = document.getElementById("toastEmoji");
 
 const duckTypes = [
   {
@@ -61,17 +65,62 @@ const duckTypes = [
   }
 ];
 
+const achievementsData = [
+  {
+    id: "first_fight",
+    name: "First Blood",
+    desc: "Complete your very first duck battle.",
+    emoji: "🐣",
+    check: (p) => p.totalDucksFought > 0
+  },
+  {
+    id: "flock_master",
+    name: "Flock Master",
+    desc: "Accumulate 1,000 total ducks fought.",
+    emoji: "🦆",
+    check: (p) => p.totalDucksFought >= 1000
+  },
+  {
+    id: "avian_overlord",
+    name: "Avian Overlord",
+    desc: "Accumulate 50,000 total ducks fought.",
+    emoji: "👑",
+    check: (p) => p.totalDucksFought >= 50000
+  },
+  {
+    id: "rubber_squeezer",
+    name: "Squeaky Clean",
+    desc: "Encounter and defeat a Rubber Duck.",
+    emoji: "🛀",
+    check: (p) => p.ducksByType["Rubber Duck"] > 0
+  },
+  {
+    id: "spell_bound",
+    name: "Hogwarts Graduate",
+    desc: "Encounter a Wizard Duck.",
+    emoji: "🧙‍♂️",
+    check: (p) => p.ducksByType["Wizard Duck"] > 0
+  },
+  {
+    id: "star_gazer",
+    name: "Stargazer",
+    desc: "Encounter the rare Cosmic Duck.",
+    emoji: "🌌",
+    check: (p) => p.ducksByType["Cosmic Duck"] > 0
+  }
+];
+
 const duckTypeNames = duckTypes.map((duckType) => duckType.name);
-const DUCK_FIGHT_SAVE_KEY = "duckFight_playerData_v1";
+const DUCK_FIGHT_SAVE_KEY = "duckFight_playerData_v2";
 const FIGHT_COOLDOWN = 800;
 
 let battleCount = 0;
 let fightInProgress = false;
 let lastFightTime = 0;
+let toastTimeout = null;
 
 function createNewPlayerData() {
   const duckCounts = {};
-
   for (const duckName of duckTypeNames) {
     duckCounts[duckName] = 0;
   }
@@ -79,7 +128,8 @@ function createNewPlayerData() {
   return {
     name: "Duck Fighter",
     totalDucksFought: 0,
-    ducksByType: duckCounts
+    ducksByType: duckCounts,
+    achievements: {}
   };
 }
 
@@ -94,26 +144,23 @@ function loadPlayerData() {
     const parsedData = JSON.parse(savedData);
     const loadedData = createNewPlayerData();
 
-    if (
-      typeof parsedData.name === "string" &&
-      parsedData.name.trim() !== ""
-    ) {
+    if (typeof parsedData.name === "string" && parsedData.name.trim() !== "") {
       loadedData.name = parsedData.name.trim();
     }
 
-    if (
-      typeof parsedData.totalDucksFought === "number" &&
-      parsedData.totalDucksFought >= 0
-    ) {
+    if (typeof parsedData.totalDucksFought === "number" && parsedData.totalDucksFought >= 0) {
       loadedData.totalDucksFought = parsedData.totalDucksFought;
     }
 
     for (const duckName of duckTypeNames) {
       const savedCount = parsedData.ducksByType?.[duckName];
-
       if (typeof savedCount === "number" && savedCount >= 0) {
         loadedData.ducksByType[duckName] = savedCount;
       }
+    }
+
+    if (parsedData.achievements && typeof parsedData.achievements === "object") {
+      loadedData.achievements = parsedData.achievements;
     }
 
     return loadedData;
@@ -126,36 +173,56 @@ function loadPlayerData() {
 let playerData = loadPlayerData();
 
 function savePlayerData() {
-  localStorage.setItem(
-    DUCK_FIGHT_SAVE_KEY,
-    JSON.stringify(playerData)
-  );
+  localStorage.setItem(DUCK_FIGHT_SAVE_KEY, JSON.stringify(playerData));
+}
+
+function showAchievementToast(achievement) {
+  toastEmoji.textContent = achievement.emoji;
+  toastName.textContent = achievement.name;
+  achievementToast.classList.remove("hidden");
+
+  if (toastTimeout) {
+    clearTimeout(toastTimeout);
+  }
+
+  toastTimeout = setTimeout(() => {
+    achievementToast.classList.add("hidden");
+  }, 3500);
+}
+
+function checkAchievements() {
+  let newlyUnlocked = false;
+
+  for (const ach of achievementsData) {
+    if (!playerData.achievements[ach.id] && ach.check(playerData)) {
+      playerData.achievements[ach.id] = true;
+      showAchievementToast(ach);
+      newlyUnlocked = true;
+    }
+  }
+
+  if (newlyUnlocked) {
+    savePlayerData();
+  }
 }
 
 function recordDuckFight(duckName, amount) {
-  if (!duckTypeNames.includes(duckName)) {
-    return;
-  }
-
-  if (!Number.isInteger(amount) || amount < 0) {
-    return;
-  }
+  if (!duckTypeNames.includes(duckName)) return;
+  if (!Number.isInteger(amount) || amount < 0) return;
 
   playerData.totalDucksFought += amount;
   playerData.ducksByType[duckName] += amount;
 
+  checkAchievements();
   savePlayerData();
   updateAccountMenu();
 }
 
 function updateAccountMenu() {
   welcomeMessage.textContent = `Welcome, ${playerData.name}!`;
-
-  totalDucksFought.textContent =
-    playerData.totalDucksFought.toLocaleString();
+  totalDucksFought.textContent = playerData.totalDucksFought.toLocaleString();
 
   duckTypeStats.replaceChildren();
-
   for (const duckType of duckTypes) {
     const statRow = document.createElement("div");
     statRow.className = "duck-stat";
@@ -164,17 +231,42 @@ function updateAccountMenu() {
     duckName.textContent = `${duckType.emoji} ${duckType.name}`;
 
     const duckAmount = document.createElement("strong");
-    duckAmount.textContent =
-      playerData.ducksByType[duckType.name].toLocaleString();
+    duckAmount.textContent = playerData.ducksByType[duckType.name].toLocaleString();
 
     statRow.append(duckName, duckAmount);
     duckTypeStats.appendChild(statRow);
+  }
+
+  achievementList.replaceChildren();
+  for (const ach of achievementsData) {
+    const isUnlocked = !!playerData.achievements[ach.id];
+
+    const achItem = document.createElement("div");
+    achItem.className = `achievement-badge-item ${isUnlocked ? "unlocked" : ""}`;
+
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "achievement-icon";
+    iconDiv.textContent = isUnlocked ? ach.emoji : "🔒";
+
+    const infoDiv = document.createElement("div");
+    infoDiv.className = "achievement-info";
+
+    const titleSpan = document.createElement("span");
+    titleSpan.className = "achievement-name";
+    titleSpan.textContent = ach.name;
+
+    const descSpan = document.createElement("span");
+    descSpan.className = "achievement-desc";
+    descSpan.textContent = ach.desc;
+
+    infoDiv.append(titleSpan, descSpan);
+    achItem.append(iconDiv, infoDiv);
+    achievementList.appendChild(achItem);
   }
 }
 
 function savePlayerName() {
   const newName = playerNameInput.value.trim();
-
   if (newName === "") {
     alert("Please enter a fighter name.");
     return;
@@ -198,16 +290,10 @@ function closeAccountMenu() {
 }
 
 function resetPlayerStats() {
-  const shouldReset = window.confirm(
-    "Reset your local Duck Fight stats? This cannot be undone."
-  );
-
-  if (!shouldReset) {
-    return;
-  }
+  const shouldReset = window.confirm("Reset your local Duck Fight stats and achievements? This cannot be undone.");
+  if (!shouldReset) return;
 
   const savedName = playerData.name;
-
   playerData = createNewPlayerData();
   playerData.name = savedName;
 
@@ -221,7 +307,6 @@ function getRandomDuckType() {
 
   for (const duckType of duckTypes) {
     cumulativeWeight += duckType.weight;
-
     if (randomNumber <= cumulativeWeight) {
       return duckType;
     }
@@ -232,15 +317,8 @@ function getRandomDuckType() {
 
 function generateBaseDuckCount() {
   const randomNumber = Math.random();
-
-  if (randomNumber < 0.03) {
-    return 0;
-  }
-
-  if (randomNumber < 0.06) {
-    return 1;
-  }
-
+  if (randomNumber < 0.03) return 0;
+  if (randomNumber < 0.06) return 1;
   return Math.floor(Math.random() * 148) + 2;
 }
 
@@ -268,16 +346,10 @@ function recordHistory(duckName, count) {
 
 function startFight() {
   const now = Date.now();
-  if (now - lastFightTime < FIGHT_COOLDOWN) {
-    return;
-  }
+  if (now - lastFightTime < FIGHT_COOLDOWN) return;
+  if (fightInProgress) return;
 
   lastFightTime = now;
-  
-  if (fightInProgress) {
-    return;
-  }
-
   fightInProgress = true;
   battleCount++;
 
@@ -312,9 +384,7 @@ fightBtn.addEventListener("click", startFight);
 
 document.addEventListener("keydown", (event) => {
   const activeElement = document.activeElement;
-  const isTyping =
-    activeElement.tagName === "INPUT" ||
-    activeElement.tagName === "TEXTAREA";
+  const isTyping = activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA";
 
   if (event.code === "Space" && !event.repeat && !isTyping) {
     event.preventDefault();
@@ -343,4 +413,6 @@ accountMenu.addEventListener("click", (event) => {
   }
 });
 
+// Initial load check
+checkAchievements();
 updateAccountMenu();
