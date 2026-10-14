@@ -88,6 +88,13 @@ const achievementsData = [
     check: (p) => p.totalDucksFought >= 50000
   },
   {
+    id: "avian_annihilator",
+    name: "Avian Annihilator",
+    desc: "Accumulate 1,000,000 total ducks fought
+    emoji: "👑👑👑",
+    check: (p) =>.totalDucksFought >= 1000000
+  },
+  {
     id: "rubber_squeezer",
     name: "Squeaky Clean",
     desc: "Encounter and defeat a Rubber Duck.",
